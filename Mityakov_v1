@@ -1,0 +1,96 @@
+#include <stdlib.h>
+#include <iostream>
+#include <vector>
+#include <memory>
+#include <string>
+
+using namespace std;
+
+
+class Item
+{
+	string name;
+public:
+	void print() const
+	{
+		cout << name << endl;
+	}
+	string getname() const
+	{
+		return name;
+	}
+	Item(const string n) { name = n; };
+	virtual ~Item() {};
+};
+
+
+class File : public Item
+{
+	string str;
+public:
+	File(const string n) : Item(n) { str = "str"; }
+	File(const string n, string s) : Item(n) { str = s; }
+};
+
+
+class Directory : public Item
+{
+	vector<File*> files;
+	vector<Directory*> dirs;
+public:
+	Directory(const string n) : Item(n) {};
+	void addFile(File* f)
+	{
+		files.push_back(f);
+	}
+	void addDirectory(Directory* d)
+	{
+		dirs.push_back(d);
+	}
+	File* findFile(const string n) const
+	{
+		for (unsigned int i = 0; i < files.size(); i++)
+		{
+			if (files[i]->getname() == n) return files[i];
+		}
+		return NULL;
+	}
+	Directory* findDir(const string n) const
+	{
+		for (unsigned int i = 0; i < dirs.size(); i++)
+		{
+			if (dirs[i]->getname() == n) return dirs[i];
+		}
+	}
+    void printNames() const
+	{
+		cout << "Files:" << endl;
+		for (unsigned int i = 0; i < files.size(); i++)
+		{
+			files[i]->print();
+		}
+		cout << "Directories:" << endl;
+		for (unsigned int i = 0; i < dirs.size(); i++)
+		{
+			dirs[i]->print();
+		}
+	}
+};
+
+
+int main()
+{
+	Directory* root = new Directory("C");
+	File* f1 = new File("File1");
+	File* f2 = new File("File2");
+	root->addFile(f1);
+	root->addFile(f2);
+	Directory* d1 = new Directory("system32");
+	root->addDirectory(d1);
+	root->printNames();
+	cout << "Finder:" << endl;
+	File* f = root->findFile("File1");
+	if (f == 0) cout << "Didnt find!" << endl;
+	else f->print();
+	system("pause");
+}
